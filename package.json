@@ -1,0 +1,24 @@
+{
+  "name": "@local/dsh-modlens-vision-bridge",
+  "version": "1.0.0",
+  "icon": "icon.svg",
+  "private": true,
+  "type": "module",
+  "description": "Standalone vision-routing patch for modlens: forces text-only models advertised as image-capable to be OCR'd by modlens instead of receiving raw pictures, without editing modlens.",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "selftest.mjs"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

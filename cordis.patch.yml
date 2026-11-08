@@ -1,0 +1,52 @@
+# dsh-modlens-vision-bridge — standalone vision-routing patch for modlens.
+# Self-contained: ALL bridge policy lives here, modlens is left stock.
+# ORDER MATTERS: keep this plugin BEFORE @liustack/modlens in
+# dsh.profile.bundles so its resolveModelInfo wrapper is installed before
+# modlens runs its apply-time live-agent scan.
+- insert:
+    - id: modlens-vision-bridge
+      name: '@local/dsh-modlens-vision-bridge'
+      config:
+        # visionProvider/autoRead belong to modlens and stay in its own block.
+        # bridgeRoutes = text-only models whose catalog now admits images (via the
+        # provider's imageModelIds) so the UI lets the user attach a picture, but
+        # which must still be OCR'd by the modlens engine, not handed raw to a
+        # blind model. MUST stay paired with imageModelIds in BOTH workbuddy
+        # regions, or images either have no intake or reach a blind model.
+        bridgeRoutes:
+          - provider: workbuddy
+            model: hy3
+          - provider: workbuddy-global
+            model: hy3
+          - provider: workbuddy
+            model: hy3-x
+          - provider: workbuddy-global
+            model: hy3-x
+          - provider: workbuddy
+            model: hy3-b
+          - provider: workbuddy-global
+            model: hy3-b
+          - provider: workbuddy
+            model: hy3-c
+          - provider: workbuddy-global
+            model: hy3-c
+          - provider: workbuddy
+            model: hy4std
+          - provider: workbuddy-global
+            model: hy4std
+          - provider: workbuddy
+            model: hy4free
+          - provider: workbuddy-global
+            model: hy4free
+        # Veto list: proven native-vision models must never be OCR-degraded even
+        # if a future edit accidentally adds them to bridgeRoutes / imageModelIds.
+        # glm-5.3-flash / minimax-m3.1-flash read images natively (measured).
+        nativeVisionModels:
+          - provider: workbuddy
+            model: glm-5.3-flash
+          - provider: workbuddy-global
+            model: glm-5.3-flash
+          - provider: workbuddy
+            model: minimax-m3.1-flash
+          - provider: workbuddy-global
+            model: minimax-m3.1-flash
