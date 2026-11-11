@@ -1,13 +1,33 @@
 # dsh-modlens-vision-bridge — standalone vision-routing patch for modlens.
 # Self-contained: ALL bridge policy lives here, modlens is left stock.
 # ORDER MATTERS: keep this plugin BEFORE @liustack/modlens in
-# dsh.profile.bundles so its resolveModelInfo wrapper is installed before
-# modlens runs its apply-time live-agent scan.
+# dsh.profile.bundles so its resolveModelInfo wrapper (and the probe verdicts
+# restored from state/probe-cache.json) are installed before modlens runs its
+# apply-time live-agent scan.
 - insert:
     - id: modlens-vision-bridge
       name: '@local/dsh-modlens-vision-bridge'
       config:
-        # visionProvider/autoRead belong to modlens and stay in its own block.
+        # autoProbe: background probe of every unclassified model at startup.
+        # READS -> nativeVisionModels, REFUSED -> bridgeRoutes (only when the
+        # route already advertises 'image'; otherwise reported as needsPairing).
+        # Verdicts persist in <plugin>/state/probe-cache.json and are re-applied
+        # synchronously on the next start. Nothing outside the plugin dir is
+        # read or written.
+        autoProbe: true
+        probe:
+          enabled: true
+          delayMs: 8000
+          providers:
+            - workbuddy
+            - workbuddy-global
+            - officeace
+          # Optional direct-HTTP credentials for providers the host cannot probe
+          # (a host-mediated ctx.llm.visionProbe is preferred and needs none):
+          # credentials:
+          #   - provider: officeace
+          #     baseUrl: https://...
+          #     apiKey: sk-...
         # bridgeRoutes = text-only models whose catalog now admits images (via the
         # provider's imageModelIds) so the UI lets the user attach a picture, but
         # which must still be OCR'd by the modlens engine, not handed raw to a
@@ -38,6 +58,9 @@
             model: hy4free
           - provider: workbuddy-global
             model: hy4free
+        # hy3 / hy4free / hy6 are text-only but are NOT all paired yet: the
+        # auto-probe parks an unpaired model as needsPairing instead of adding a
+        # dead bridge. Pair them in regions.{cn,global}.imageModelIds to enable.
         # Veto list: proven native-vision models must never be OCR-degraded even
         # if a future edit accidentally adds them to bridgeRoutes / imageModelIds.
         # glm-5.3-flash / minimax-m3.1-flash read images natively (measured).

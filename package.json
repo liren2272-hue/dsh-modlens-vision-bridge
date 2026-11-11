@@ -1,21 +1,30 @@
 {
   "name": "@local/dsh-modlens-vision-bridge",
-  "version": "1.0.0",
-  "icon": "icon.svg",
+  "version": "1.2.0",
+  "icon": "./icon.svg",
   "private": true,
   "type": "module",
-  "description": "Standalone vision-routing patch for modlens: forces text-only models advertised as image-capable to be OCR'd by modlens instead of receiving raw pictures, without editing modlens.",
+  "description": "Standalone vision-routing patch for modlens: forces text-only models advertised as image-capable to be OCR'd by modlens instead of receiving raw pictures, without editing modlens. Auto-probes unclassified models at startup and remembers the verdicts in its own state directory.",
   "main": "index.js",
   "exports": {
-    ".": "./index.js"
+    ".": "./index.js",
+    "./icon": "./icon.svg"
   },
   "files": [
     "index.js",
+    "lib/probe.mjs",
+    "lib/probeRunner.mjs",
+    "lib/verdictStore.mjs",
     "cordis.patch.yml",
     "icon.svg",
     "README.md",
-    "selftest.mjs"
+    "selftest-autoprobe.mjs",
+    "selftest-wrapper.mjs",
+    "selftest-syntax.mjs"
   ],
+  "scripts": {
+    "test": "node selftest-autoprobe.mjs"
+  },
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
